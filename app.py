@@ -500,7 +500,17 @@ def send_otp_email(email, otp):
                 if resend_success:
                     return True
         except HTTPError as error:
-            app.logger.warning("Resend OTP failed (HTTPError %s): %s", error.code, error.reason)
+            error_body = ""
+            try:
+                error_body = error.read().decode("utf-8", errors="replace")
+            except Exception:
+                error_body = "<unable to read response body>"
+            app.logger.warning(
+                "Resend OTP failed (HTTPError %s): %s | response=%s",
+                error.code,
+                error.reason,
+                error_body,
+            )
         except URLError as error:
             app.logger.warning("Resend OTP failed (URLError): %s", error.reason)
         except TimeoutError:
