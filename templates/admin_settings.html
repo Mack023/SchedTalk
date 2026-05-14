@@ -1,0 +1,86 @@
+{% extends "admin_layout.html" %}
+
+{% block title %}SchedTalk - Settings{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+{% if saved %}
+<div class="alert success">Settings saved successfully.</div>
+{% endif %}
+{% if upload_error %}
+<div class="alert error">{{ upload_error }}</div>
+{% endif %}
+
+<section class="dashboard-grid">
+    <article class="panel">
+        <div class="panel-header">
+            <h2>Admin Profile</h2>
+            <span>Update what appears in the dashboard</span>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="form-grid">
+            <div class="profile-image-field full-width">
+                <div class="settings-avatar-preview">
+                    {% if profile.profile_image_url %}
+                    <img src="{{ profile.profile_image_url }}" alt="{{ profile.username }} profile image">
+                    {% else %}
+                    <span>{{ profile.initials }}</span>
+                    {% endif %}
+                </div>
+                <label class="profile-upload-control">
+                    Profile Image
+                    <input type="file" name="profile_image" accept=".png,.jpg,.jpeg,.gif,.webp">
+                    <small>Upload PNG, JPG, JPEG, GIF, or WEBP. This image is saved to your admin account.</small>
+                </label>
+            </div>
+            <label>
+                Display Name
+                <input type="text" name="display_name" value="{{ profile.username }}" required>
+            </label>
+            <label>
+                Email
+                <input type="email" name="email" value="{{ profile.email }}" required>
+            </label>
+            <label>
+                Clinic Name
+                <input type="text" name="clinic_name" value="{{ clinic_name }}" required>
+            </label>
+            <label>
+                Contact Number
+                <input type="text" name="contact_number" value="{{ contact_number }}" required>
+            </label>
+            <div class="form-actions full-width">
+                <button type="submit" class="primary-btn">Save Settings</button>
+            </div>
+        </form>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <h2>System Status</h2>
+            <span>Quick overview</span>
+        </div>
+
+        <div class="stack-list">
+            <div class="list-item">
+                <div>
+                    <strong>Sidebar navigation</strong>
+                    <p>All admin menu icons now point to live pages.</p>
+                </div>
+            </div>
+            <div class="list-item">
+                <div>
+                    <strong>Patient management</strong>
+                    <p>You can search and add patients from the Patients screen.</p>
+                </div>
+            </div>
+            <div class="list-item">
+                <div>
+                    <strong>Appointment updates</strong>
+                    <p>Status changes can be saved directly from Calendar.</p>
+                </div>
+            </div>
+        </div>
+    </article>
+</section>
+{% endblock %}

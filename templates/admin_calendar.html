@@ -1,0 +1,161 @@
+{% extends "admin_layout.html" %}
+
+{% block title %}SchedTalk - Calendar{% endblock %}
+{% block page_title %}Calendar{% endblock %}
+
+{% block content %}
+{% if created %}
+<div class="alert success">Appointment created successfully.</div>
+{% endif %}
+{% if updated %}
+<div class="alert success">Appointment status updated.</div>
+{% endif %}
+{% if date_unavailable %}
+<div class="alert success">That date already has a booking and cannot be used again.</div>
+{% endif %}
+
+<section class="dashboard-grid">
+    <article class="panel">
+        <div class="panel-header">
+            <h2>Schedule Appointment</h2>
+            <span>Create a new clinic booking</span>
+        </div>
+
+        <form method="post" class="form-grid">
+            <label>
+                Patient
+                <input type="text" name="patient" required>
+            </label>
+            <label>
+                Age
+                <input type="number" name="age" min="0" required>
+            </label>
+            <label>
+                Email
+                <input type="email" name="email" placeholder="patient@email.com">
+            </label>
+            <label>
+                Gender
+                <select name="gender" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                    <option value="Not set">Not set</option>
+                </select>
+            </label>
+            <label>
+                Phone
+                <input type="text" name="phone" required>
+            </label>
+            <label>
+                Doctor
+                <select name="doctor" required>
+                    <option value="Dr. Carlos">Dr. Carlos</option>
+                    <option value="Dr. Bagsic">Dr. Bagsic</option>
+                    <option value="Dr. Rabacio">Dr. Rabacio</option>
+                </select>
+            </label>
+            <label>
+                Date
+                <input type="date" name="date" required>
+            </label>
+            <label>
+                Time
+                <input type="text" name="time" placeholder="09:00 AM" required>
+            </label>
+            <label>
+                Appointment Type
+                <input type="text" name="type" placeholder="Consultation" required>
+            </label>
+            <div class="form-actions full-width">
+                <button type="submit" class="primary-btn">Add Appointment</button>
+            </div>
+        </form>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <h2>Quick Notes</h2>
+            <span>Daily admin reminders</span>
+        </div>
+
+        <div class="stack-list">
+            <div class="list-item">
+                <div>
+                    <strong>Confirm pending bookings</strong>
+                    <p>Check all patients marked pending before end of day.</p>
+                </div>
+            </div>
+            <div class="list-item">
+                <div>
+                    <strong>Prepare tomorrow's files</strong>
+                    <p>Print appointment summaries for the next clinic session.</p>
+                </div>
+            </div>
+            <div class="list-item">
+                <div>
+                    <strong>Review cancelled slots</strong>
+                    <p>Offer open times to the waitlist if there are cancellations.</p>
+                </div>
+            </div>
+        </div>
+    </article>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Appointment Calendar</h2>
+        <span>{{ appointments|length }} appointments</span>
+    </div>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Reminder Status</th>
+                    <th>Update</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                <tr>
+                    <td>{{ appointment.patient }}</td>
+                    <td>{{ appointment.doctor }}</td>
+                    <td>{{ appointment.date }}<br><small>{{ appointment.time }}</small></td>
+                    <td>{{ appointment.type }}</td>
+                    <td><span class="status-pill {{ appointment.status|lower|replace(' ', '-') }}">{{ appointment.status }}</span></td>
+                    <td>
+                        <div class="reminder-status-list">
+                            <span class="reminder-chip{% if appointment.reminder_24h_sent %} is-on{% endif %}">24h</span>
+                            <span class="reminder-chip{% if appointment.reminder_2h_sent %} is-on{% endif %}">2h</span>
+                            <span class="reminder-chip{% if appointment.missed_followup_sent %} is-on{% endif %}">Missed</span>
+                        </div>
+                    </td>
+                    <td>
+                        <form method="post" action="{{ url_for('update_appointment_status', appointment_id=appointment.id) }}" class="inline-form">
+                            <select name="status">
+                                <option value="Scheduled" {% if appointment.status == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+                                <option value="Pending" {% if appointment.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="Completed" {% if appointment.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                <option value="No Show" {% if appointment.status == 'No Show' %}selected{% endif %}>No Show</option>
+                                <option value="Cancelled" {% if appointment.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                            <button type="submit" class="secondary-btn">Save</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="empty-row">No pending or scheduled appointments in the calendar.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

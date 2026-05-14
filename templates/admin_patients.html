@@ -1,0 +1,206 @@
+{% extends "admin_layout.html" %}
+
+{% block title %}SchedTalk - Patients{% endblock %}
+{% block page_title %}Patients{% endblock %}
+
+{% block content %}
+{% if added %}
+<div class="alert success">Patient added successfully.</div>
+{% endif %}
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Patient Directory</h2>
+        <button class="primary-btn" type="button" data-open-modal="patientModal">Add Patient</button>
+    </div>
+
+    <div class="toolbar">
+        <form method="get" class="search-form">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" name="q" value="{{ search_query }}" placeholder="Search by patient, phone, or condition" id="patientSearch">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <div class="table-wrap">
+        <table class="data-table patient-table" id="patientTable">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Phone</th>
+                    <th>Condition</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr data-patient-row>
+                    <td>
+                        <button class="patient-link" type="button" data-open-modal="patientHistory{{ patient.id }}">
+                            {{ patient.name }}
+                        </button>
+                    </td>
+                    <td>{{ patient.age }}</td>
+                    <td>{{ patient.gender }}</td>
+                    <td>{{ patient.phone }}</td>
+                    <td>{{ patient.condition }}</td>
+                    <td>{{ patient_email_by_id.get(patient.id, "") or "No email yet" }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="empty-row">No patients matched your search.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-bar" id="patientPagination" hidden>
+        <button class="secondary-btn" type="button" id="patientPrevPage">
+            <i class="fa-solid fa-chevron-left"></i>
+            Previous
+        </button>
+        <span id="patientPageLabel">Page 1 of 1</span>
+        <button class="secondary-btn" type="button" id="patientNextPage">
+            Next
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+</section>
+
+{% for patient in patients %}
+{% set history = patient_histories[patient.id] %}
+<div class="modal" id="patientHistory{{ patient.id }}">
+    <div class="modal-card modal-card-wide">
+        <div class="modal-header">
+            <div>
+                <p class="eyebrow">Patient history</p>
+                <h2>{{ patient.name }}</h2>
+            </div>
+            <button type="button" class="icon-btn" data-close-modal="patientHistory{{ patient.id }}">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="patient-profile-grid">
+            <div class="summary-box">
+                <span>Total Visits</span>
+                <strong>{{ history.counts.total }}</strong>
+            </div>
+            <div class="summary-box">
+                <span>Completed</span>
+                <strong>{{ history.counts.completed }}</strong>
+            </div>
+            <div class="summary-box">
+                <span>Cancelled</span>
+                <strong>{{ history.counts.cancelled }}</strong>
+            </div>
+            <div class="summary-box">
+                <span>Upcoming</span>
+                <strong>{{ history.counts.upcoming }}</strong>
+            </div>
+        </div>
+
+        <div class="patient-detail-grid">
+            <section class="detail-box">
+                <h3>Patient Notes</h3>
+                <p>{{ patient.condition or "No notes recorded yet." }}</p>
+                <small>{{ patient.gender }}{% if patient.age %}, {{ patient.age }} years old{% endif %}{% if patient.phone %} | {{ patient.phone }}{% endif %}</small>
+            </section>
+
+            <section class="detail-box">
+                <h3>Next Appointment</h3>
+                {% if history.next_appointment %}
+                <p>{{ history.next_appointment.type }} with {{ history.next_appointment.doctor }}</p>
+                <small>{{ history.next_appointment.date }} at {{ history.next_appointment.time }}</small>
+                {% else %}
+                <p>No upcoming appointment.</p>
+                <small>Completed and cancelled records remain below.</small>
+                {% endif %}
+            </section>
+        </div>
+
+        <div class="table-wrap history-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Doctor</th>
+                        <th>Type</th>
+                        <th>Notes</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in history.appointments %}
+                    <tr>
+                        <td>{{ appointment.date }}<br><small>{{ appointment.time }}</small></td>
+                        <td>{{ appointment.doctor }}<br><small>{{ appointment.specialty }}</small></td>
+                        <td>{{ appointment.type }}</td>
+                        <td>{{ appointment.notes or appointment.type or patient.condition or "No notes" }}</td>
+                        <td><span class="status-pill {{ appointment.status|lower|replace(' ', '-') }}">{{ appointment.status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="empty-row">No appointment history yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<div class="modal" id="patientModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2>Add Patient</h2>
+            <button type="button" class="icon-btn" data-close-modal="patientModal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form method="post" class="form-grid">
+            <label>
+                Full Name
+                <input type="text" name="name" required>
+            </label>
+            <label>
+                Age
+                <input type="number" name="age" min="0" required>
+            </label>
+            <label>
+                Gender
+                <select name="gender" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </label>
+            <label>
+                Phone
+                <input type="text" name="phone" required>
+            </label>
+            <label class="full-width">
+                Condition / Notes
+                <input type="text" name="condition" required>
+            </label>
+            <label>
+                Status
+                <select name="status" required>
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="Checked In">Checked In</option>
+                    <option value="Pending">Pending</option>
+                </select>
+            </label>
+            <div class="form-actions full-width">
+                <button type="button" class="secondary-btn" data-close-modal="patientModal">Cancel</button>
+                <button type="submit" class="primary-btn">Save Patient</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SchedTalk - Select Date & Time</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='booking.css') }}">
+</head>
+<body>
+    <div class="booking-wrapper parallax-zone" data-initial-date="{{ today_value }}">
+        <div class="booking-bg blob-1" data-parallax="0.12"></div>
+        <div class="booking-bg blob-2" data-parallax="0.08"></div>
+
+        <div class="booking-header reveal">
+            <div>
+                <p class="booking-kicker">SchedTalk Appointment</p>
+                <h1 class="main-title">Select a Date & Time</h1>
+                <p class="booking-subtitle">Choose your preferred schedule and confirm your details.</p>
+            </div>
+            <a href="{{ url_for('index') }}" class="back-link">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Home</span>
+            </a>
+        </div>
+
+        {% if booking_success %}
+        <div class="booking-alert success reveal">
+            Your appointment was booked successfully and is now visible in the admin calendar and dashboard.
+        </div>
+        {% endif %}
+        {% if booking_error %}
+        <div class="booking-alert error reveal">
+            That time slot is already booked. Please choose another available time.
+        </div>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('submit_booking') }}" class="grid-container reveal" id="bookingForm">
+            <div class="calendar-and-contact">
+                <div class="calendar-card" data-parallax="0.02">
+                    <div class="month-header">
+                        <button type="button" class="nav-arrow" id="prevMonth" aria-label="Previous month">
+                            <i class="fa-solid fa-angle-left"></i>
+                        </button>
+                        <h3 class="month-name" id="monthDisplay"></h3>
+                        <button type="button" class="nav-arrow" id="nextMonth" aria-label="Next month">
+                            <i class="fa-solid fa-angle-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="days-of-week">
+                        <div class="dow sunday">SUN</div>
+                        <div class="dow">MON</div>
+                        <div class="dow">TUE</div>
+                        <div class="dow">WED</div>
+                        <div class="dow">THU</div>
+                        <div class="dow">FRI</div>
+                        <div class="dow">SAT</div>
+                    </div>
+
+                    <div class="calendar-days-grid" id="calendarDays"></div>
+                </div>
+
+                <div class="contact-section">
+                    <h3>Contact Info</h3>
+                    <div class="contact-form">
+                        <div class="form-group"><input type="text" name="name" placeholder="Name" value="{{ profile_name }}" required></div>
+                        <div class="form-group"><input type="email" name="email" placeholder="Email" value="{{ profile_email }}" required></div>
+                        <div class="form-group"><input type="tel" name="phone" placeholder="Phone Number" value="{{ profile_phone }}" required></div>
+                        <div class="form-group"><select name="appointment_type" required><option value="General Consultation">General Consultation</option><option value="Pediatric Consultation">Pediatric Consultation</option><option value="Dental Consultation">Dental Consultation</option><option value="Follow-up Consultation">Follow-up Consultation</option></select></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="times-and-note">
+                <div class="times-section">
+                    <h3 id="availabilityHeader">Available time for selected date</h3>
+                    <div class="times-nav" id="timesNav">
+                        <button type="button" class="time-nav-arrow" id="timePrevBtn" aria-label="Previous available times">
+                            <i class="fa-solid fa-angle-left"></i>
+                        </button>
+                        <span class="times-nav-label" id="timesNavLabel">1-4</span>
+                        <button type="button" class="time-nav-arrow" id="timeNextBtn" aria-label="Next available times">
+                            <i class="fa-solid fa-angle-right"></i>
+                        </button>
+                    </div>
+                    <div class="times-list" id="timesList">
+                        {% for time in available_times %}
+                        <button type="button" class="time-card {% if loop.first %}selected-time{% endif %}" data-time="{{ time }}">{{ time }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="note-section">
+                    <div class="note-input-group">
+                        <label for="notes">Notes</label>
+                        <textarea placeholder="Reason for your visit or extra details" class="note-box" name="notes" id="notes"></textarea>
+                    </div>
+                </div>
+
+                <div class="booking-summary">
+                    <div class="summary-row"><span>Selected Date</span><strong id="selectedDateLabel"></strong></div>
+                    <div class="summary-row"><span>Selected Time</span><strong id="selectedTimeLabel">{{ available_times[0] if available_times else 'Unavailable' }}</strong></div>
+                </div>
+
+                <input type="hidden" name="appointment_date" id="appointmentDateInput" value="{{ today_value }}">
+                <input type="hidden" name="appointment_time" id="appointmentTimeInput" value="{{ available_times[0] if available_times else '' }}">
+
+                <button class="confirm-btn" type="submit" id="confirmBookingBtn">Confirm Booking</button>
+            </div>
+        </form>
+    </div>
+
+    <script id="booking-config" type="application/json">{{ {
+        "availableSlotsByDate": available_slots_by_date
+    } | tojson }}</script>
+    <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+</body>
+</html>

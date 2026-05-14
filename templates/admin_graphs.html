@@ -1,0 +1,84 @@
+{% extends "admin_layout.html" %}
+
+{% block title %}SchedTalk - Graphs{% endblock %}
+{% block page_title %}Graphs{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        <h2>Analytics Filters</h2>
+    </div>
+    <div class="graphs-controls">
+        <label>
+            Date Range
+            <select id="graphsDaysFilter">
+                <option value="7" {% if graphs_payload.days == 7 %}selected{% endif %}>Last 7 days</option>
+                <option value="30" {% if graphs_payload.days == 30 %}selected{% endif %}>Last 30 days</option>
+                <option value="90" {% if graphs_payload.days == 90 %}selected{% endif %}>Last 90 days</option>
+            </select>
+        </label>
+    </div>
+</section>
+
+<section class="kpi-grid" id="graphsKpiGrid">
+    <article class="stat-card">
+        <div class="stat-icon blue"><i class="fa-solid fa-calendar-check"></i></div>
+        <div>
+            <p>Total Bookings</p>
+            <strong id="kpiTotalBookings">{{ graphs_payload.kpis.total_bookings }}</strong>
+        </div>
+    </article>
+    <article class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div>
+            <p>Completion Rate</p>
+            <strong id="kpiCompletionRate">{{ graphs_payload.kpis.completion_rate }}%</strong>
+        </div>
+    </article>
+    <article class="stat-card">
+        <div class="stat-icon amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div>
+            <p>Cancellation Rate</p>
+            <strong id="kpiCancellationRate">{{ graphs_payload.kpis.cancellation_rate }}%</strong>
+        </div>
+    </article>
+    <article class="stat-card">
+        <div class="stat-icon red"><i class="fa-solid fa-user-slash"></i></div>
+        <div>
+            <p>No-show Rate</p>
+            <strong id="kpiNoShowRate">{{ graphs_payload.kpis.no_show_rate }}%</strong>
+        </div>
+    </article>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Patient Bookings Trend</h2>
+        <span id="weeklyBookingsTotal">0 total bookings</span>
+    </div>
+    <div class="chart-legend" id="weeklyBookingsLegend">
+        <span><i class="legend-swatch legend-this-week"></i>This Week</span>
+        <span><i class="legend-swatch legend-last-week"></i>Last Week</span>
+    </div>
+    <div
+        class="weekly-chart"
+        id="weeklyBookingsChart"
+        data-weekly-bookings='{{ graphs_payload.weekly_bookings|tojson }}'
+        data-last-week-bookings='{{ graphs_payload.last_week_bookings|tojson }}'
+        data-graphs-data-url="/admin/graphs/data"
+        data-current-days="{{ graphs_payload.days }}"
+        data-current-doctor="{{ graphs_payload.doctor }}"
+    ></div>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Insights</h2>
+    </div>
+    <div class="insight-grid" id="graphsInsights">
+        {% for insight in graphs_payload.insights %}
+        <article class="insight-card">{{ insight }}</article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

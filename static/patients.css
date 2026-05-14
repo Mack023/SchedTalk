@@ -1,0 +1,176 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f4f7fe;
+}
+
+/* Layout Wrapper */
+.admin-wrapper {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 85px;
+    background-color: #007bff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px 0;
+    flex-shrink: 0;
+}
+
+.sidebar-logo {
+    color: white;
+    font-size: 28px;
+    margin-bottom: 50px;
+}
+
+.sidebar-icons {
+    display: flex;
+    flex-direction: column;
+    gap: 35px; /* Fixes bunching */
+    flex-grow: 1;
+}
+
+.sidebar-icons a {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 22px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.sidebar-icons a.active, .sidebar-icons a:hover {
+    color: white;
+}
+
+.settings-link {
+    margin-top: auto;
+    margin-bottom: 20px;
+}
+
+/* Main Content */
+.content-area {
+    flex-grow: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.main-header h1 {
+    font-size: 28px;
+    color: #1a1a1a;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-text {
+    text-align: right;
+}
+
+.profile-text strong {
+    display: block;
+    font-size: 14px;
+}
+
+.profile-text span {
+    font-size: 12px;
+    color: #888;
+}
+
+.user-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Action Bar */
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+.search-box input {
+    width: 320px;
+    padding: 12px 15px 12px 45px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    background: white;
+    outline: none;
+}
+
+.btn-add {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Table Card */
+.table-container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    text-align: left;
+    color: #999;
+    font-weight: 500;
+    font-size: 14px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.data-table td {
+    padding: 20px 0;
+    border-bottom: 1px solid #f9f9f9;
+    font-size: 14px;
+    color: #333;
+}
+
+.badge-status {
+    color: #007bff;
+    font-weight: 600;
+}

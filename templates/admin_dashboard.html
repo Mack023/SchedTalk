@@ -1,0 +1,131 @@
+{% extends "admin_layout.html" %}
+
+{% block title %}SchedTalk - Admin Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="stats-grid" data-dashboard-summary-url="/admin/dashboard/summary">
+    <article class="stat-card">
+        <div class="stat-icon blue"><i class="fa-solid fa-calendar-day"></i></div>
+        <div>
+            <p>Today's Appointments</p>
+            <strong id="todayAppointmentsCount">{{ stats.today }}</strong>
+            <span id="todayAppointmentsLabel">{{ today_label }}</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-icon amber"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div>
+            <p>Pending / Scheduled</p>
+            <strong id="pendingAppointmentsCount">{{ stats.pending }}</strong>
+            <span>Needs attention</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div>
+            <p>Completed</p>
+            <strong id="completedAppointmentsCount">{{ stats.completed }}</strong>
+            <span>Finished visits</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-icon red"><i class="fa-solid fa-ban"></i></div>
+        <div>
+            <p>Cancelled</p>
+            <strong id="cancelledAppointmentsCount">{{ stats.cancelled }}</strong>
+            <span>Missed schedule</span>
+        </div>
+    </article>
+</section>
+
+<section class="dashboard-grid">
+    <article class="panel">
+        <div class="panel-header">
+            <h2>Today's Schedule</h2>
+            <a href="{{ url_for('admin_calendar') }}">Open calendar</a>
+        </div>
+
+        <div class="stack-list" id="todayScheduleList" {% if not today_appointments %}style="display: none;"{% endif %}>
+            {% for appointment in today_appointments %}
+            <div class="list-item">
+                <div>
+                    <strong>{{ appointment.patient }}</strong>
+                    <p>{{ appointment.type }} with {{ appointment.doctor }}</p>
+                </div>
+                <div class="item-meta">
+                    <span>{{ appointment.time }}</span>
+                    <span class="status-pill {{ appointment.status|lower|replace(' ', '-') }}">{{ appointment.status }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="empty-state" id="todayScheduleEmpty" {% if today_appointments %}style="display: none;"{% endif %}>
+            <i class="fa-regular fa-clock"></i>
+            <p>No appointments scheduled for today.</p>
+        </div>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <h2>Patient Overview</h2>
+            <a href="{{ url_for('admin_patients') }}">Manage patients</a>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-box">
+                <span>Total Patients</span>
+                <strong>{{ patient_status_counts.total }}</strong>
+            </div>
+            <div class="summary-box">
+                <span>With Upcoming Visit</span>
+                <strong>{{ patient_status_counts.upcoming }}</strong>
+            </div>
+            <div class="summary-box">
+                <span>Completed Today</span>
+                <strong>{{ patient_status_counts.completed_today }}</strong>
+            </div>
+            <div class="summary-box">
+                <span>Completed This Month</span>
+                <strong>{{ patient_status_counts.completed_this_month }}</strong>
+            </div>
+        </div>
+    </article>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Recent Activity</h2>
+        <span>{{ recent_appointments|length }} latest records</span>
+    </div>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in recent_appointments %}
+                <tr>
+                    <td>{{ appointment.patient }}</td>
+                    <td>{{ appointment.doctor }}<br><small>{{ appointment.specialty }}</small></td>
+                    <td>{{ appointment.date }}<br><small>{{ appointment.time }}</small></td>
+                    <td>{{ appointment.type }}</td>
+                    <td><span class="status-pill {{ appointment.status|lower|replace(' ', '-') }}">{{ appointment.status }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
