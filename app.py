@@ -75,6 +75,7 @@ app.config["CONTACT_RECIPIENT"] = os.environ.get("SCHEDTALK_CONTACT_RECIPIENT", 
 app.config["RESEND_API_KEY"] = os.environ.get("RESEND_API_KEY", "")
 app.config["OTP_FROM_EMAIL"] = os.environ.get("OTP_FROM_EMAIL", "onboarding@resend.dev")
 app.config["OTP_EXPIRE_SECONDS"] = int(os.environ.get("OTP_EXPIRE_SECONDS", "300"))
+app.config["SCHEDTALK_DEMO_OTP_BYPASS"] = os.environ.get("SCHEDTALK_DEMO_OTP_BYPASS", "0") == "1"
 app.config["GROQ_API_KEY"] = os.environ.get("GROQ_API_KEY", "")
 app.config["GROQ_MODEL"] = os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant")
 app.config["GOOGLE_CLIENT_ID"] = os.environ.get("GOOGLE_CLIENT_ID", "")
@@ -557,6 +558,13 @@ def send_otp_email(email, otp):
         return True
     except Exception as error:
         app.logger.warning("SMTP OTP fallback failed: %s", error)
+        if app.config["SCHEDTALK_DEMO_OTP_BYPASS"]:
+            app.logger.warning(
+                "DEMO OTP bypass enabled. OTP for %s is %s (email delivery failed).",
+                email,
+                otp,
+            )
+            return True
         return resend_success
 
 
