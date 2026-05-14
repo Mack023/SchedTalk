@@ -63,11 +63,13 @@ if mysql_connect_timeout:
     mysql_custom_options["connect_timeout"] = int(mysql_connect_timeout)
 if mysql_custom_options:
     app.config["MYSQL_CUSTOM_OPTIONS"] = mysql_custom_options
-app.config["MAIL_SERVER"] = os.environ.get("SCHEDTALK_MAIL_SERVER", "smtp.gmail.com")
-app.config["MAIL_PORT"] = int(os.environ.get("SCHEDTALK_MAIL_PORT", "465"))
-app.config["MAIL_USE_SSL"] = os.environ.get("SCHEDTALK_MAIL_USE_SSL", "1") == "1"
-app.config["MAIL_USERNAME"] = os.environ.get("SCHEDTALK_MAIL_USERNAME", "sched.talk23@gmail.com")
-app.config["MAIL_PASSWORD"] = os.environ.get("SCHEDTALK_MAIL_PASSWORD", "")
+app.config["MAIL_SERVER"] = os.environ.get("SCHEDTALK_MAIL_SERVER", os.environ.get("MAIL_SERVER", "smtp.gmail.com"))
+app.config["MAIL_PORT"] = int(os.environ.get("SCHEDTALK_MAIL_PORT", os.environ.get("MAIL_PORT", "465")))
+app.config["MAIL_USE_SSL"] = os.environ.get("SCHEDTALK_MAIL_USE_SSL", os.environ.get("MAIL_USE_SSL", "1")) == "1"
+app.config["MAIL_USERNAME"] = os.environ.get(
+    "SCHEDTALK_MAIL_USERNAME", os.environ.get("MAIL_USERNAME", "sched.talk23@gmail.com")
+)
+app.config["MAIL_PASSWORD"] = os.environ.get("SCHEDTALK_MAIL_PASSWORD", os.environ.get("MAIL_PASSWORD", ""))
 app.config["CONTACT_RECIPIENT"] = os.environ.get("SCHEDTALK_CONTACT_RECIPIENT", "sched.talk23@gmail.com")
 app.config["RESEND_API_KEY"] = os.environ.get("RESEND_API_KEY", "")
 app.config["OTP_FROM_EMAIL"] = os.environ.get("OTP_FROM_EMAIL", "onboarding@resend.dev")
