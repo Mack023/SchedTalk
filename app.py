@@ -618,6 +618,28 @@ def fetch_user_by_email(email):
     return user
 
 
+def finalize_login_for_user(user):
+    session["loggedin"] = True
+    session["account_username"] = user[1]
+    session["username"] = user[5] or user[1]
+    session["email"] = user[3]
+    session["profile_pic"] = ""
+    session["role"] = user[4]
+    session["full_name"] = user[5] or user[1]
+    session["phone"] = user[6] or ""
+    session["age"] = user[7]
+    session["gender"] = user[8] or ""
+
+    if session["role"] == "admin":
+        apply_admin_profile_to_session(
+            user[1],
+            default_username=user[5] or user[1],
+            default_email=user[3],
+        )
+        return redirect(url_for("admin_dashboard"))
+    return redirect(url_for("index"))
+
+
 def begin_otp_for_user(user, username_for_redirect):
     user_email = (user[3] or "").strip()
     if not user_email:
@@ -2000,7 +2022,7 @@ def login():
                     )
                 )
 
-            return begin_otp_for_user(user, username)
+            return finalize_login_for_user(user)
 
         return redirect(
             url_for(
@@ -2115,7 +2137,7 @@ def google_auth_callback():
     if not user:
         return redirect(url_for("index", login_error="google_login_failed"))
 
-    return begin_otp_for_user(user, user[1])
+    return finalize_login_for_user(user)
 
 
 @app.route("/verify-otp", methods=["GET", "POST"])
