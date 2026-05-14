@@ -70,6 +70,7 @@ app.config["MAIL_USERNAME"] = os.environ.get(
     "SCHEDTALK_MAIL_USERNAME", os.environ.get("MAIL_USERNAME", "sched.talk23@gmail.com")
 )
 app.config["MAIL_PASSWORD"] = os.environ.get("SCHEDTALK_MAIL_PASSWORD", os.environ.get("MAIL_PASSWORD", ""))
+app.config["MAIL_TIMEOUT_SECONDS"] = int(os.environ.get("SCHEDTALK_MAIL_TIMEOUT_SECONDS", "8"))
 app.config["CONTACT_RECIPIENT"] = os.environ.get("SCHEDTALK_CONTACT_RECIPIENT", "sched.talk23@gmail.com")
 app.config["RESEND_API_KEY"] = os.environ.get("RESEND_API_KEY", "")
 app.config["OTP_FROM_EMAIL"] = os.environ.get("OTP_FROM_EMAIL", "onboarding@resend.dev")
@@ -538,12 +539,17 @@ def send_otp_email(email, otp):
     )
 
     try:
+        mail_timeout = app.config["MAIL_TIMEOUT_SECONDS"]
         if app.config["MAIL_USE_SSL"]:
-            with smtplib.SMTP_SSL(app.config["MAIL_SERVER"], app.config["MAIL_PORT"]) as smtp:
+            with smtplib.SMTP_SSL(
+                app.config["MAIL_SERVER"], app.config["MAIL_PORT"], timeout=mail_timeout
+            ) as smtp:
                 smtp.login(app.config["MAIL_USERNAME"], mail_password)
                 smtp.send_message(otp_email)
         else:
-            with smtplib.SMTP(app.config["MAIL_SERVER"], app.config["MAIL_PORT"]) as smtp:
+            with smtplib.SMTP(
+                app.config["MAIL_SERVER"], app.config["MAIL_PORT"], timeout=mail_timeout
+            ) as smtp:
                 smtp.starttls()
                 smtp.login(app.config["MAIL_USERNAME"], mail_password)
                 smtp.send_message(otp_email)
